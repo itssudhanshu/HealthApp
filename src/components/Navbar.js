@@ -1,8 +1,35 @@
-import React from 'react'
-
+import React, { useState } from 'react';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import PropTypes from 'prop-types'
 
+
+
 export default  function Navbar(props) {
+
+
+    const [prompt, setPrompt] = useState('');
+    const [generatedText, setGeneratedText] = useState('');
+
+    const handleChange = (event) => {
+    setPrompt(event.target.value);
+    };
+
+    const handleGenerateText = async () => {
+    setGeneratedText("")
+    const genAI = new GoogleGenerativeAI("AIzaSyAYI-K0-z7OAcTjQp1f1AS7t9Yq27o8WLU");
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+    const result = await model.generateContent(
+    "Give me breif about " + prompt + " healthy or not and if not why in 30-40 words, Also give me macro distribution like the following Protein : g, Carbs : g, Fats : g. And if the above statement is not related to food by any chance please return " + "Please ask something related to food :)" );
+    const response = await result.response;
+    const text = await response.text();
+    setGeneratedText(text);
+    }
+
+
+
+
+
     return(
         <nav className="navbar navbar-expand-lg bg-light">
   <div className="container-fluid">
@@ -19,14 +46,46 @@ export default  function Navbar(props) {
           <a className="nav-link" href="/">{props.aboutText}</a>
         </li>
       </ul>
-      <form className="d-flex" role="search">
-        <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-        <button className="btn btn-outline-success" type="submit">Search</button>
-      </form>
+        <input className="form-control me-2" 
+          style={{
+              width : "25%" 
+         }}  
+          value={prompt} onChange={handleChange} 
+          type="search" placeholder="Ask Anything!" 
+          aria-label="Search"/>
+    <button style={{
+          width : "auto",
+          height : "auto"
+    }}  
+          onClick={handleGenerateText} 
+          type="button" 
+          className="btn btn-primary" 
+          data-bs-toggle="modal" 
+          data-bs-target="#exampleModal">
+  Go!
+</button>
+
+
+<div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div className="modal-dialog">
+    <div className="modal-content">
+      <div className="modal-header">
+        <h1 className="modal-title fs-5" id="exampleModalLabel">Response</h1>
+        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div className="modal-body">
+        {generatedText}
+      </div>
+      <div className="modal-footer">
+        <button  type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
     </div>
   </div>
 </nav>
-    )
+    );
 }   
 
 
